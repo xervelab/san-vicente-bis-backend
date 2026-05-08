@@ -22,6 +22,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'api_token',
+        'role',
     ];
 
     /**
@@ -32,6 +34,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'api_token',
     ];
 
     /**
@@ -45,5 +48,87 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * User role constants
+     */
+    const ROLE_ADMIN = 'admin';
+    const ROLE_STAFF = 'staff';
+    const ROLE_APPROVER = 'approver';
+    const ROLE_RESIDENT = 'resident';
+
+    /**
+     * Demo accounts configuration
+     */
+    const DEMO_ACCOUNTS = [
+        'admin@bisv.ph' => [
+            'name' => 'Ricardo Dela Cruz',
+            'role' => self::ROLE_ADMIN,
+            'roleName' => 'Administrator'
+        ],
+        'staff@bisv.ph' => [
+            'name' => 'Maria Santos',
+            'role' => self::ROLE_STAFF,
+            'roleName' => 'Barangay Staff'
+        ],
+        'captain@bisv.ph' => [
+            'name' => 'Eduardo Reyes',
+            'role' => self::ROLE_APPROVER,
+            'roleName' => 'Barangay Captain'
+        ],
+        'resident@bisv.ph' => [
+            'name' => 'Ana Bautista',
+            'role' => self::ROLE_RESIDENT,
+            'roleName' => 'Resident'
+        ],
+    ];
+
+    /**
+     * Check if user has a specific role
+     */
+    public function hasRole(string $role): bool
+    {
+        return $this->role === $role;
+    }
+
+    /**
+     * Check if user is admin
+     */
+    public function isAdmin(): bool
+    {
+        return $this->hasRole(self::ROLE_ADMIN);
+    }
+
+    /**
+     * Check if user is staff
+     */
+    public function isStaff(): bool
+    {
+        return $this->hasRole(self::ROLE_STAFF);
+    }
+
+    /**
+     * Check if user is approver
+     */
+    public function isApprover(): bool
+    {
+        return $this->hasRole(self::ROLE_APPROVER);
+    }
+
+    /**
+     * Check if user is resident
+     */
+    public function isResident(): bool
+    {
+        return $this->hasRole(self::ROLE_RESIDENT);
+    }
+
+    /**
+     * Get role display name
+     */
+    public function getRoleNameAttribute(): string
+    {
+        return self::DEMO_ACCOUNTS[$this->email]['roleName'] ?? ucfirst($this->role);
     }
 }
