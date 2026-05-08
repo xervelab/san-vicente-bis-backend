@@ -15,6 +15,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Seed roles and permissions first
+        $this->call(RolePermissionSeeder::class);
+
         // Create demo accounts
         foreach (User::DEMO_ACCOUNTS as $email => $account) {
             User::firstOrCreate(

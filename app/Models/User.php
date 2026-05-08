@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -130,5 +131,75 @@ class User extends Authenticatable
     public function getRoleNameAttribute(): string
     {
         return self::DEMO_ACCOUNTS[$this->email]['roleName'] ?? ucfirst($this->role);
+    }
+
+    /**
+     * Get all roles for this user (relationship-based)
+     */
+    public function roles(): BelongsToMany
+    {
+        return $this->belongsToMany(Role::class, 'user_roles');
+    }
+
+    /**
+     * Get all permissions for this user through roles
+     */
+    public function permissions(): BelongsToMany
+    {
+        return $this->hasManyThrough(
+            Permission::class,
+            Role::class,
+            'id',
+            'id',
+            'id',
+            'id'
+        )->through('role_permissions');
+    }
+
+    /**
+     * Check if user has a specific permission
+     */
+    public function hasPermission(string $permission): bool
+    {
+        $roleModel = Role::where('name', $this->role)->first();
+        return $roleModel ? $roleModel->hasPermission($permission) : false;
+    }
+
+    /**
+     * Check if user has any of the given permissions
+     */
+    public function hasAnyPermission(array $permissions): bool
+    {
+        $roleModel = Role::where('name', $this->role)->first();
+        if (!$roleModel) {
+            return false;
+        }
+
+        foreach ($permissions as $permission) {
+            if ($roleModel->hasPermission($permission)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if user has all of the given permissions
+     */
+    public function hasAllPermissions(array $permissions): bool
+    {
+        $roleModel = Role::where('name', $this->role)->first();
+        if (!$roleModel) {
+            return false;
+        }
+
+        foreach ($permissions as $permission) {
+            if (!$roleModel->hasPermission($permission)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
