@@ -65,3 +65,20 @@ export const ROLE_DISPLAY_NAMES: Record<UserRole, string> = {
   approver: 'Barangay Captain',
   resident: 'Resident',
 };
+
+// Resident-related constants
+export const PUROK_OPTIONS = ['Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5', 'Purok 6'] as const;
+export const STATUS_OPTIONS = ['Active', 'Inactive', 'Senior', 'Deceased', 'Transferred'] as const;
+
+export type PurokOption = typeof PUROK_OPTIONS[number];
+export type StatusOption = typeof STATUS_OPTIONS[number];
+
+export interface Resident {
+  id: number;
+  name: string;
+  age: number;
+  purok: PurokOption;
+  status: StatusOption;
+  created_at: string;
+  updated_at: string;
+}
