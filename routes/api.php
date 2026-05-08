@@ -8,6 +8,8 @@ Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout']);
 Route::post('/forgot-password', [App\Http\Controllers\AuthController::class, 'forgotPassword']);
 Route::post('/reset-password', [App\Http\Controllers\AuthController::class, 'resetPassword']);
 
+Route::apiResource('residents', App\Http\Controllers\ResidentController::class);
+
 Route::get('/', function () {
     return response()->json(['message' => 'Welcome to the API'], 200);
 });
