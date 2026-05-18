@@ -15,11 +15,29 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // Seed roles and permissions first
+        $this->call(RolePermissionSeeder::class);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        // Create demo accounts
+        foreach (User::DEMO_ACCOUNTS as $email => $account) {
+            User::firstOrCreate(
+                ['email' => $email],
+                [
+                    'name' => $account['name'],
+                    'role' => $account['role'],
+                    'password' => bcrypt('password'), // Default password for demo accounts
+                ]
+            );
+        }
+
+        // Create additional test user if needed
+        User::firstOrCreate(
+            ['email' => 'test@example.com'],
+            [
+                'name' => 'Test User',
+                'role' => User::ROLE_RESIDENT,
+                'password' => bcrypt('password'),
+            ]
+        );
     }
 }
